@@ -21,7 +21,7 @@ REQUIRES = [
 setup(
     name='pytest-tipsi-testing',
     version=version,
-    description='Better',
+    description='Better fixtures management. Various helpers',
     long_description=readme,
     author='cybergrind',
     author_email='cybergrind@gmail.com',
