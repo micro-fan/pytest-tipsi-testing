@@ -18,6 +18,7 @@ def pytest_configure(config):
         vprint_func = print
 
 
+@pytest.fixture(autouse=True)
 def load_fixtures_by_scope(request):
     """
     loads fixtures in order: session => module => class => function

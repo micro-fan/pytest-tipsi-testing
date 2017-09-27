@@ -27,9 +27,12 @@ Motivation and features
 
 We want to make fixtures more predictable in pytest. So this plugin ensures that only loaded fixtures will be available when test is running.
 
-Currently pytest allows fixtures with bigger scopes (session, module and etc.) to be instantiated event if test doesn't directly require them. This may cause some troubles in several cases, for example if you wan't to create some kind of cache in bigger fixture.
+Currently pytest allows fixtures with bigger scopes (session, module and etc.) to be instantiated even if test doesn't directly require them. This may cause some troubles in several cases, for example if you wan't to create some kind of cache in bigger fixture.
 
 This means that all not required fixtures will be finished before test is started: even with bigger scope. So if you want to have some fixtures always awailable (eg. docker_start fixture with session scope) - you should make it autoused.
+
+
+Also we're forcing correct order for fixtures with different scopes: session -> module -> class -> function.
 
 
 Usecase
