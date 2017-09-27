@@ -8,17 +8,20 @@ with open('pytest_tipsi_testing/__init__.py', 'r') as f:
             version = line.strip().split('=')[1].strip(' \'"')
             break
     else:
-        version = '0.0.1'
+        version = '0.1.0'
 
 with open('README.rst', 'r', encoding='utf-8') as f:
     readme = f.read()
 
-REQUIRES = []
+REQUIRES = [
+    'pytest',
+    # 'tipsi-tools>=1.7.0',
+]
 
 setup(
     name='pytest-tipsi-testing',
     version=version,
-    description='',
+    description='Better',
     long_description=readme,
     author='cybergrind',
     author_email='cybergrind@gmail.com',
@@ -28,8 +31,12 @@ setup(
     license='MIT',
 
     keywords=[
-        'pytest', 'helpers', 'fixtures',
+        'pytest', 'helpers', 'fixtures', 'scopes', 'ordering',
     ],
+
+    entry_points={
+        'pytest11': ['pytest_tipsi_testing = pytest_tipsi_testing.plugin'],
+    },
 
     classifiers=[
         'Development Status :: 4 - Beta',
