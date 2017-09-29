@@ -18,18 +18,48 @@ def pytest_configure(config):
         vprint_func = print
 
 
-@pytest.fixture(autouse=True)
-def load_fixtures_by_scope(request):
+_set_fixtures = set()
+_lvl = None
+
+
+def pytest_fixture_setup(fixturedef, request):
     """
     loads fixtures in order: session => module => class => function
     """
-    skip_fixtures = set([request.fixturename, 'module_transaction', 'request'])
+    global _lvl
+    if _lvl or fixturedef.scope == _lvl:
+        return
+
+    print('FDEF: {} {}'.format(fixturedef, request))
+    skip_fixtures = set([request.fixturename, 'module_transaction', 'request', 'auto_transaction'])
+
     for scope in ['session', 'module', 'class', 'function']:
-        for name in set(request.fixturenames) - skip_fixtures:
+        _lvl = scope
+        if fixturedef.scope == _lvl:
+            print('Call => {}'.format(fixturedef))
+            _lvl = None
+            return
+
+        for name in set(request.fixturenames) - skip_fixtures - _set_fixtures:
+            if name == fixturedef.argname:
+                print('Call => {}'.format(fixturedef))
+                _set_fixtures.add(name)
+                _lvl = None
+                return
+
             fdef = request._arg2fixturedefs[name][0]
+
             if fdef.scope == scope:
+                print('CALL => : {} {}'.format(fdef, _set_fixtures))
                 request.getfixturevalue(name)
                 skip_fixtures.add(name)
+    _set_fixtures.add(fixturedef.argname)
+    _lvl = None
+
+
+def pytest_fixture_post_finalizer(fixturedef):
+    print('Descard: {}'.format(fixturedef))
+    _set_fixtures.discard(fixturedef.argname)
 
 
 def finish_unused_fixtures(item, nextitem):
