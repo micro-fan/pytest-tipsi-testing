@@ -58,7 +58,7 @@ def pytest_fixture_setup(fixturedef, request):
 
 
 def pytest_fixture_post_finalizer(fixturedef):
-    print('Descard: {}'.format(fixturedef))
+    print('Discard: {}'.format(fixturedef))
     _set_fixtures.discard(fixturedef.argname)
 
 
@@ -70,7 +70,9 @@ def finish_unused_fixtures(item, nextitem):
     skip_finishing = set(item.fixturenames) & set(nextitem.fixturenames)
     vprint_func('Skip finishing: {}'.format(skip_finishing))
 
-    to_finish = set(item.fixturenames) - set(nextitem.fixturenames)
+    skip_fixtures = set(['request'])
+
+    to_finish = set(item.fixturenames) - set(nextitem.fixturenames) - skip_fixtures
     for name in to_finish:
         fdef = defs[name][0]
         vprint_func('Finish fixture: {}'.format(name))
