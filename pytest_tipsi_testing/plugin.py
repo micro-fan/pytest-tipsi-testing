@@ -30,19 +30,19 @@ def pytest_fixture_setup(fixturedef, request):
     if _lvl or fixturedef.scope == _lvl:
         return
 
-    print('FDEF: {} {}'.format(fixturedef, request))
+    vprint_func('FDEF: {} {}'.format(fixturedef, request))
     skip_fixtures = set([request.fixturename, 'module_transaction', 'request', 'auto_transaction'])
 
     for scope in ['session', 'module', 'class', 'function']:
         _lvl = scope
         if fixturedef.scope == _lvl:
-            print('Call => {}'.format(fixturedef))
+            vprint_func('Call => {}'.format(fixturedef))
             _lvl = None
             return
 
         for name in set(request.fixturenames) - skip_fixtures - _set_fixtures:
             if name == fixturedef.argname:
-                print('Call => {}'.format(fixturedef))
+                vprint_func('Call => {}'.format(fixturedef))
                 _set_fixtures.add(name)
                 _lvl = None
                 return
@@ -50,7 +50,7 @@ def pytest_fixture_setup(fixturedef, request):
             fdef = request._arg2fixturedefs[name][0]
 
             if fdef.scope == scope:
-                print('CALL => : {} {}'.format(fdef, _set_fixtures))
+                vprint_func('CALL => : {} {}'.format(fdef, _set_fixtures))
                 request.getfixturevalue(name)
                 skip_fixtures.add(name)
     _set_fixtures.add(fixturedef.argname)
@@ -58,7 +58,7 @@ def pytest_fixture_setup(fixturedef, request):
 
 
 def pytest_fixture_post_finalizer(fixturedef):
-    print('Discard: {}'.format(fixturedef))
+    vprint_func('Discard: {}'.format(fixturedef))
     _set_fixtures.discard(fixturedef.argname)
 
 
