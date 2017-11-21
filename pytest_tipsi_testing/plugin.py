@@ -118,7 +118,8 @@ def log_requests(request):
             'status_code': response.status_code,
             'status_text': response.reason,
             'response_headers': repr(response.headers),
-            'response_full': tipsi_pformat(response.json()),
+            'response_full': response.text,
+            'response': tipsi_pformat(response.json()),
         }
         records.append(record)
         return response

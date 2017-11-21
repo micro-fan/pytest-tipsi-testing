@@ -17,4 +17,4 @@ def test_docme(tmpdir, log_requests):
     assert len(data) == 1, data
     data = data[0]
     assert data['method'] == 'get', data
-    assert data['response_full'] == "{'key': 'value', 'one': 'two'}", data
+    assert data['response'] == "{'key': 'value', 'one': 'two'}", data
