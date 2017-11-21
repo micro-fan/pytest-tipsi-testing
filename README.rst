@@ -57,7 +57,7 @@ Print that works only when verbose mode is enabled ``-v``.
 log_requests
 ^^^^^^^^^^^^
 
-Use it when you want to write down all request/responses made with `requests <http://docs.python-requests.org/en/master/>`_ library. By default it will put docs into `.doc` dir or other directory supplied by `DOCS_ROOT` environmental variable.
+Use it when you want to write down all request/responses made with `requests <http://docs.python-requests.org/en/master/>`_ library. By default it will put docs into ``.doc`` dir or other directory supplied by ``DOCS_ROOT`` environmental variable.
 
 .. code-block:: python
 
@@ -68,4 +68,4 @@ Use it when you want to write down all request/responses made with `requests <ht
       assert r.status_code == 200, r
 
 
-It will put json file into your `.doc/{MODULE_PATH}.out_file.json`, in my case it was a `.doc/tests.test_log_requests.out.json` your case may be different depending on module you have used it in.
+It will put json file into your ``.doc/{MODULE_PATH}.out_file.json``, in my case it was a ``.doc/tests.test_log_requests.out.json`` your case may be different depending on module you have used it in.
