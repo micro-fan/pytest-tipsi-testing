@@ -127,6 +127,7 @@ def log_requests(request):
 
     @contextmanager
     def _ret(doc_path, items=slice(None)):
+        nonlocal records
         with patch.object(requests.sessions.Session, 'request', _logreq):
             yield
         path = os.environ.get('DOCS_ROOT', './.doc')
@@ -135,4 +136,5 @@ def log_requests(request):
         fname = os.path.join(path, '{}.{}.json'.format(request.function.__module__, doc_path))
         with open(fname, 'w') as f:
             json.dump(records[items], f)
+        records = []
     yield _ret
