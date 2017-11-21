@@ -51,6 +51,9 @@ setup(
     ],
 
     install_requires=REQUIRES,
+    extras_require={
+        'log_requests': ['requests==2.18.*'],
+    },
     tests_require=['coverage', 'pytest'],
 
     packages=find_packages(),
