@@ -1,3 +1,9 @@
+import json
+import os
+from contextlib import suppress, contextmanager
+from pprint import pformat
+from unittest.mock import patch
+
 import pytest
 
 
@@ -81,3 +87,50 @@ def finish_unused_fixtures(item, nextitem):
 
 def pytest_runtest_teardown(item, nextitem):
     finish_unused_fixtures(item, nextitem)
+
+
+def tipsi_pformat(something):
+    if isinstance(something, str):
+        with suppress(Exception):
+            something = json.loads(something)
+    return pformat(something, indent=2)
+
+
+@pytest.fixture
+def log_requests(request):
+    """
+    read more in README.rst
+    we don't force to install requests into project as a dependency
+    if you're not using log_requests
+    """
+    import requests  # see docstring
+    original_request = requests.sessions.Session.request
+    records = []
+
+    def _logreq(*args, **kwargs):
+        nonlocal records
+        response = original_request(*args, **kwargs)
+        record = {
+            'method': kwargs['method'],
+            'path': kwargs['url'],
+            'query': kwargs.get('params'),
+            'payload': tipsi_pformat(kwargs.get('json', kwargs.get('data'))),
+            'status_code': response.status_code,
+            'status_text': response.reason,
+            'response_headers': repr(response.headers),
+            'response_full': tipsi_pformat(response.json()),
+        }
+        records.append(record)
+        return response
+
+    @contextmanager
+    def _ret(doc_path, items=slice(None)):
+        with patch.object(requests.sessions.Session, 'request', _logreq):
+            yield
+        path = os.environ.get('DOCS_ROOT', './.doc')
+        if not os.path.exists(path):
+            os.mkdir(path)
+        fname = os.path.join(path, '{}.{}.json'.format(request.function.__module__, doc_path))
+        with open(fname, 'w') as f:
+            json.dump(records[items], f)
+    yield _ret

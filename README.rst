@@ -52,3 +52,20 @@ vprint
 Print that works only when verbose mode is enabled ``-v``.
 
 *Note*: you should add ``-s`` to see the output.
+
+
+log_requests
+^^^^^^^^^^^^
+
+Use it when you want to write down all request/responses made with `requests <http://docs.python-requests.org/en/master/>`_ library. By default it will put docs into `.doc` dir or other directory supplied by `DOCS_ROOT` environmental variable.
+
+.. code-block:: python
+
+  def example(log_requests):
+    import requests
+    with log_request('out_file'):
+      r = requests.get('http://echo.jsontest.com/key/value/one/two')
+      assert r.status_code == 200, r
+
+
+It will put json file into your `.doc/{MODULE_PATH}.out_file.json`, in my case it was a `.doc/tests.test_log_requests.out.json` your case may be different depending on module you have used it in.
