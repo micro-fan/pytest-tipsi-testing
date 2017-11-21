@@ -3,6 +3,7 @@ import os
 from contextlib import suppress, contextmanager
 from pprint import pformat
 from unittest.mock import patch
+from urllib.parse import urlparse
 
 import pytest
 
@@ -112,8 +113,8 @@ def log_requests(request):
         response = original_request(*args, **kwargs)
         record = {
             'method': kwargs['method'],
-            'path': kwargs['url'],
-            'query': kwargs.get('params'),
+            'path': urlparse(kwargs['url']).path,
+            'query': kwargs.get('params', ''),
             'payload': tipsi_pformat(kwargs.get('json', kwargs.get('data'))),
             'status_code': response.status_code,
             'status_text': response.reason,
