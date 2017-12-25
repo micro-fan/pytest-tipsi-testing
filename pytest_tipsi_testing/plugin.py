@@ -83,7 +83,7 @@ def finish_unused_fixtures(item, nextitem):
     for name in to_finish:
         fdef = defs[name][0]
         vprint_func('Finish fixture: {}'.format(name))
-        fdef.finish()
+        fdef.finish(item._request)
 
 
 def pytest_runtest_teardown(item, nextitem):

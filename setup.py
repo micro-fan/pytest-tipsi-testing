@@ -14,7 +14,7 @@ with open('README.rst', 'r', encoding='utf-8') as f:
     readme = f.read()
 
 REQUIRES = [
-    'pytest',
+    'pytest>=3.3.0',
     # 'tipsi-tools>=1.7.0',
 ]
 
