@@ -81,9 +81,11 @@ def finish_unused_fixtures(item, nextitem):
 
     to_finish = set(item.fixturenames) - set(nextitem.fixturenames) - skip_fixtures
     for name in to_finish:
-        fdef = defs[name][0]
-        vprint_func('Finish fixture: {}'.format(name))
-        fdef.finish(item._request)
+        # see: tests/nesting for test
+        # fixes finishing of imported from one conftest into upper conftest
+        for fdef in reversed(defs[name]):
+            vprint_func('Finish fixture: {} {}'.format(name, fdef))
+            fdef.finish(item._request)
 
 
 def pytest_runtest_teardown(item, nextitem):
