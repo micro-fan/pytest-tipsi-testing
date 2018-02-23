@@ -122,7 +122,7 @@ def log_requests(request):
             'status_text': response.reason,
             'response_headers': repr(response.headers),
             'response_full': response.text,
-            'response': tipsi_pformat(response.json()),
+            'response': tipsi_pformat(response.text),
         }
         records.append(record)
         return response
