@@ -8,7 +8,14 @@ from urllib.parse import urlparse
 import pytest
 
 
-def vprint_func(*args, **kwargs):
+def gen_vprint(curr_level):
+    def _inner(*args, level=1, **kwargs):
+        if level <= curr_level:
+            print(*args, **kwargs)
+    return _inner
+
+
+def vprint_func(*args, level=1, **kwargs):
     pass
 
 
@@ -22,7 +29,7 @@ def pytest_configure(config):
     verbose = config.getoption('verbose')
     if verbose:
         global vprint_func
-        vprint_func = print
+        vprint_func = gen_vprint(verbose)
 
 
 _set_fixtures = set()
@@ -37,19 +44,19 @@ def pytest_fixture_setup(fixturedef, request):
     if _lvl or fixturedef.scope == _lvl:
         return
 
-    vprint_func('FDEF: {} {}'.format(fixturedef, request))
+    vprint_func('FDEF: {} {}'.format(fixturedef, request), level=4)
     skip_fixtures = set([request.fixturename, 'module_transaction', 'request', 'auto_transaction'])
 
     for scope in ['session', 'module', 'class', 'function']:
         _lvl = scope
         if fixturedef.scope == _lvl:
-            vprint_func('Call => {}'.format(fixturedef))
+            vprint_func('Call => {}'.format(fixturedef), level=4)
             _lvl = None
             return
 
         for name in set(request.fixturenames) - skip_fixtures - _set_fixtures:
             if name == fixturedef.argname:
-                vprint_func('Call => {}'.format(fixturedef))
+                vprint_func('Call => {}'.format(fixturedef), level=4)
                 _set_fixtures.add(name)
                 _lvl = None
                 return
@@ -57,7 +64,7 @@ def pytest_fixture_setup(fixturedef, request):
             fdef = request._arg2fixturedefs[name][0]
 
             if fdef.scope == scope:
-                vprint_func('CALL => : {} {}'.format(fdef, _set_fixtures))
+                vprint_func('CALL => : {} {}'.format(fdef, _set_fixtures), level=4)
                 request.getfixturevalue(name)
                 skip_fixtures.add(name)
     _set_fixtures.add(fixturedef.argname)
@@ -65,7 +72,7 @@ def pytest_fixture_setup(fixturedef, request):
 
 
 def pytest_fixture_post_finalizer(fixturedef):
-    vprint_func('Discard: {}'.format(fixturedef))
+    vprint_func('Discard: {}'.format(fixturedef), level=3)
     _set_fixtures.discard(fixturedef.argname)
 
 
@@ -75,7 +82,7 @@ def finish_unused_fixtures(item, nextitem):
     defs = item._fixtureinfo.name2fixturedefs
 
     skip_finishing = set(item.fixturenames) & set(nextitem.fixturenames)
-    vprint_func('Skip finishing: {}'.format(skip_finishing))
+    vprint_func('Skip finishing: {}'.format(skip_finishing), level=4)
 
     skip_fixtures = set(['request'])
 
@@ -84,7 +91,7 @@ def finish_unused_fixtures(item, nextitem):
         # see: tests/nesting for test
         # fixes finishing of imported from one conftest into upper conftest
         for fdef in reversed(defs[name]):
-            vprint_func('Finish fixture: {} {}'.format(name, fdef))
+            vprint_func('Finish fixture: {} {}'.format(name, fdef), level=4)
             fdef.finish(item._request)
 
 
