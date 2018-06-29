@@ -61,6 +61,8 @@ def pytest_fixture_setup(fixturedef, request):
                 _lvl = None
                 return
 
+            assert name in request._arg2fixturedefs, \
+                'There is no fixture `{}` in scope => {}'.format(name, request.node.nodeid)
             fdef = request._arg2fixturedefs[name][0]
 
             if fdef.scope == scope:
