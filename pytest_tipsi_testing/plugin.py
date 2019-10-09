@@ -47,7 +47,7 @@ def pytest_fixture_setup(fixturedef, request):
     vprint_func('FDEF: {} {}'.format(fixturedef, request), level=4)
     skip_fixtures = set([request.fixturename, 'module_transaction', 'request', 'auto_transaction'])
 
-    for scope in ['session', 'module', 'class', 'function']:
+    for scope in ['session', 'package', 'module', 'class', 'function']:
         _lvl = scope
         if fixturedef.scope == _lvl:
             vprint_func('Call => {}'.format(fixturedef), level=4)
