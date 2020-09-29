@@ -86,7 +86,7 @@ def finish_unused_fixtures(item, nextitem):
     skip_finishing = set(item.fixturenames) & set(nextitem.fixturenames)
     vprint_func('Skip finishing: {}'.format(skip_finishing), level=4)
 
-    skip_fixtures = set(['request'])
+    skip_fixtures = set(['request', 'event_loop'])
 
     to_finish = set(item.fixturenames) - set(nextitem.fixturenames) - skip_fixtures
     for name in to_finish:
