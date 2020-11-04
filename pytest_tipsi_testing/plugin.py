@@ -1,5 +1,6 @@
 import json
 import os
+import traceback
 from contextlib import suppress, contextmanager
 from pprint import pformat
 from unittest.mock import patch
@@ -86,15 +87,20 @@ def finish_unused_fixtures(item, nextitem):
     skip_finishing = set(item.fixturenames) & set(nextitem.fixturenames)
     vprint_func('Skip finishing: {}'.format(skip_finishing), level=4)
 
-    skip_fixtures = set(['request', 'event_loop'])
+    skip_fixtures = set(['request', 'event_loop', 'httpx_mock'])
 
     to_finish = set(item.fixturenames) - set(nextitem.fixturenames) - skip_fixtures
     for name in to_finish:
         # see: tests/nesting for test
         # fixes finishing of imported from one conftest into upper conftest
         for fdef in reversed(defs[name]):
-            vprint_func('Finish fixture: {} {}'.format(name, fdef), level=4)
-            fdef.finish(item._request)
+            try:
+                vprint_func('Finish fixture: {} {}'.format(name, fdef), level=4)
+                fdef.finish(item._request)
+            except Exception as e:
+                vprint_func('Error during finishing: {} / {} => {}'.format(name, fdef, e), level=1)
+                traceback.print_last()
+                print('If error repeats, consider adding it to skip_fixtures')
 
 
 def pytest_runtest_teardown(item, nextitem):
