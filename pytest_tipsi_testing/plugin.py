@@ -101,6 +101,7 @@ def finish_unused_fixtures(item, nextitem):
                 vprint_func('Error during finishing: {} / {} => {}'.format(name, fdef, e), level=1)
                 traceback.print_last()
                 print('If error repeats, consider adding it to skip_fixtures')
+                raise
 
 
 def pytest_runtest_teardown(item, nextitem):
