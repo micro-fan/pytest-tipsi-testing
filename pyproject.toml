@@ -51,6 +51,9 @@ exclude = [
 [tool.hatch.commands]
 prerelease = 'hatch build'
 
+[tool.hatch.entrypoints.pytest11]
+pytest_tipsi_testing = 'pytest_tipsi_testing.plugin'
+
 
 [tool.ruff]
 line-length = 100
