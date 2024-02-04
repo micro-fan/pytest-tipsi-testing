@@ -1,7 +1,7 @@
 import json
 import os
 import traceback
-from contextlib import suppress, contextmanager
+from contextlib import contextmanager, suppress
 from pprint import pformat
 from unittest.mock import patch
 from urllib.parse import urlparse
@@ -13,6 +13,7 @@ def gen_vprint(curr_level):
     def _inner(*args, level=1, **kwargs):
         if level <= curr_level:
             print(*args, **kwargs)
+
     return _inner
 
 
@@ -22,7 +23,7 @@ def vprint_func(*args, level=1, **kwargs):
 
 @pytest.fixture(scope='session')
 def vprint():
-    yield vprint_func
+    return vprint_func
 
 
 @pytest.hookimpl(trylast=True)
@@ -46,7 +47,16 @@ def pytest_fixture_setup(fixturedef, request):
         return
 
     vprint_func('FDEF: {} {}'.format(fixturedef, request), level=4)
-    skip_fixtures = set([request.fixturename, 'module_transaction', 'request', 'auto_transaction'])
+    skip_fixtures = set(
+        [
+            request.fixturename,
+            'module_transaction',
+            'request',
+            'auto_transaction',
+            'event_loop',
+            'httpx_mock',
+        ]
+    )
 
     for scope in ['session', 'package', 'module', 'class', 'function']:
         _lvl = scope
@@ -62,8 +72,9 @@ def pytest_fixture_setup(fixturedef, request):
                 _lvl = None
                 return
 
-            assert name in request._arg2fixturedefs, \
-                'There is no fixture `{}` in scope => {}'.format(name, request.node.nodeid)
+            assert (
+                name in request._arg2fixturedefs
+            ), 'There is no fixture `{}` in scope => {}'.format(name, request.node.nodeid)
             fdef = request._arg2fixturedefs[name][0]
 
             if fdef.scope == scope:
@@ -115,7 +126,7 @@ def tipsi_pformat(something):
     return pformat(something, indent=2)
 
 
-@pytest.fixture
+@pytest.fixture()
 def log_requests(request):
     """
     read more in README.rst
@@ -123,6 +134,7 @@ def log_requests(request):
     if you're not using log_requests
     """
     import requests  # see docstring
+
     original_request = requests.sessions.Session.request
     records = []
 
@@ -155,4 +167,5 @@ def log_requests(request):
         with open(fname, 'w') as f:
             json.dump(records[items], f)
         records = []
-    yield _ret
+
+    return _ret

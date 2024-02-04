@@ -14,3 +14,4 @@ wheelhouse/
 .tox
 .coverage.*
 *,cover
+/.envrc
